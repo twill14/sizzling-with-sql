@@ -1,0 +1,30 @@
+Describe the difference between the varchar and text data types.
+
+Varchar takes a length of characters up to 255
+
+Text has no limit 
+
+Describe the difference between the integer, decimal, and real data types.
+
+Integer types are whole numbers (positive and negative)
+
+Real numbers include floating point numbers 
+
+Decimals include to parts (precision and scale) 
+
+Decimals have points, but they can be limited to the scale. 
+
+The whole number portion can be limited by the precision.
+
+The largest value that can be stored in an integer column is : 
+2,147,483,647
+
+Describe the difference between the timestamp and date data types.
+
+timestamp includes date and time
+
+date only includes date
+
+Can a time with a time zone be stored in a column of type timestamp?
+
+no, but there is a timestamp with timezone data type

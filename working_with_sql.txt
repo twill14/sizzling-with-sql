@@ -1,0 +1,543 @@
+sql-course=# \d
+         List of relations
+ Schema |  Name  | Type  |  Owner
+--------+--------+-------+---------
+ public | people | table | twill14
+(1 row)
+
+sql-course=# \d public.people
+             Table "public.people"
+   Column   |         Type          | Modifiers
+------------+-----------------------+-----------
+ name       | character varying(25) |
+ age        | integer               | not null
+ occupation | character varying(50) |
+
+sql-course=# insert into people (name, age, occupation) values ('Abby', 34, 'biologist')
+sql-course-# ;
+INSERT 0 1
+sql-course=# \d people
+             Table "public.people"
+   Column   |         Type          | Modifiers
+------------+-----------------------+-----------
+ name       | character varying(25) |
+ age        | integer               | not null
+ occupation | character varying(50) |
+
+sql-course=# select * from people
+sql-course-# ;
+ name | age | occupation
+------+-----+------------
+ Abby |  34 | biologist
+(1 row)
+
+sql-course=# insert into people (name, age, occupation) values ('Mu''nisah', 26), ('Mirabelle', 40, 'contractor');
+;
+ERROR:  INSERT has more target columns than expressions
+LINE 1: insert into people (name, age, occupation) values ('Mu''nisa...
+                                       ^
+sql-course=# insert into people (name, age, occupation) values ('Mu''nisah', 26);
+ERROR:  INSERT has more target columns than expressions
+LINE 1: insert into people (name, age, occupation) values ('Mu''nisa...
+                                       ^
+sql-course=# insert into people (name, age) values ('Mu''nisah', 26);
+INSERT 0 1
+sql-course=# insert into people (name, age, occupation) values ('Mirabelle', 40, contractor);
+ERROR:  column "contractor" does not exist
+LINE 1: ... (name, age, occupation) values ('Mirabelle', 40, contractor...
+                                                             ^
+sql-course=# insert into people (name, age, occupation) values ('Mirabelle', 40, 'contractor');
+INSERT 0 1
+sql-course=# select * from people
+sql-course-# ;
+   name    | age | occupation
+-----------+-----+------------
+ Abby      |  34 | biologist
+ Mu'nisah  |  26 |
+ Mirabelle |  40 | contractor
+(3 rows)
+
+sql-course=# select * from people where name = 'Mu''nisah'
+sql-course-# ;
+   name   | age | occupation
+----------+-----+------------
+ Mu'nisah |  26 |
+(1 row)
+
+sql-course=# select * from people where age = 26
+sql-course-# ;
+   name   | age | occupation
+----------+-----+------------
+ Mu'nisah |  26 |
+(1 row)
+
+sql-course=# select * from people where occupation is null;
+   name   | age | occupation
+----------+-----+------------
+ Mu'nisah |  26 |
+(1 row)
+
+sql-course=# select * from birds where extinct = 'f' order by length desc;
+      name      | length | wingspan |   family    | extinct
+----------------+--------+----------+-------------+---------
+ Common Kestrel |   35.5 |     73.5 | Falconidae  | f
+ American Robin |   25.5 |     36.0 | Turdidae    | f
+ Spotted Towhee |   21.6 |     26.7 | Emberizidae | f
+(3 rows)
+
+sql-course=# select avg(wingspan) from birds;
+         avg
+---------------------
+ 43.2000000000000000
+(1 row)
+
+sql-course=# select max(wingspan) from birds;
+ max
+------
+ 73.5
+(1 row)
+
+sql-course=# select min(wingspan) from birds;
+ min
+------
+ 24.0
+(1 row)
+
+sql-course=# select item, menu_price - ingredient_cost as profit from menu_items order by profit desc;
+   item   | profit
+----------+--------
+ tacos    |   7.00
+ omelette |   6.50
+ oatmeal  |   5.50
+(3 rows)
+
+sql-course=# select item, menu_price - ingredient_cost as profit from menu_items order by profit desc limit 1;
+ item  | profit
+-------+--------
+ tacos |   7.00
+(1 row)
+
+sql-course=# select item, (menu_price - ingredient_cost) * sales  as profit from menu_items order by profit desc limit 1;
+ item  | profit
+-------+---------
+ tacos | 1778.00
+(1 row)
+
+sql-course=# select item, (menu_price - ingredient_cost) * sales  as profit from menu_items order by profit desc;
+   item   | profit
+----------+---------
+ tacos    | 1778.00
+ omelette | 1183.00
+ oatmeal  |  434.50
+(3 rows)
+
+sql-course=# select item, menu_price, ingredient_cost, round(prep_time/60.0 * 13.0, 2) as labor, menu_price - ingredient_cost
+sql-course-# - round(prep_time/60.0 * 13.0, 2) as profit from menu_items order by profit desc;
+   item   | menu_price | ingredient_cost | labor | profit
+----------+------------+-----------------+-------+--------
+ tacos    |        9.0 |            2.00 |  1.08 |   5.92
+ oatmeal  |        6.0 |            0.50 |  0.22 |   5.28
+ omelette |        8.0 |            1.50 |  2.17 |   4.33
+(3 rows)
+
+
+newdb=# select (high + low) / 2  as average from temperatures where date between '2016-03-02' and '2016-03-08';
+ average
+---------
+      38
+      39
+      37
+      42
+      37
+      30
+      27
+(7 rows)
+
+newdb=# select date,  (high + low) / 2  as average from temperatures where date between '2016-03-02' and '2016-03-08';
+    date    | average
+------------+---------
+ 2016-03-02 |      38
+ 2016-03-03 |      39
+ 2016-03-04 |      37
+ 2016-03-05 |      42
+ 2016-03-06 |      37
+ 2016-03-07 |      30
+ 2016-03-08 |      27
+(7 rows)
+
+newdb=# alter table temperatures add column rainfall integer default 0;
+ALTER TABLE
+newdb=# select * from temperatures
+newdb-# ;
+    date    | low | high | rainfall
+------------+-----+------+----------
+ 2016-03-01 |  34 |   43 |        0
+ 2016-03-02 |  32 |   44 |        0
+ 2016-03-03 |  31 |   47 |        0
+ 2016-03-04 |  33 |   42 |        0
+ 2016-03-05 |  39 |   46 |        0
+ 2016-03-06 |  32 |   43 |        0
+ 2016-03-07 |  29 |   32 |        0
+ 2016-03-08 |  23 |   31 |        0
+ 2016-03-09 |  17 |   28 |        0
+(9 rows)
+
+newdb=# update temperatures set rainfall = (low + high) / 2 - 35  where   (low + high) / 2 > 35;
+UPDATE 6
+newdb=# select * from temperatures
+;
+    date    | low | high | rainfall
+------------+-----+------+----------
+ 2016-03-07 |  29 |   32 |        0
+ 2016-03-08 |  23 |   31 |        0
+ 2016-03-09 |  17 |   28 |        0
+ 2016-03-01 |  34 |   43 |        3
+ 2016-03-02 |  32 |   44 |        3
+ 2016-03-03 |  31 |   47 |        4
+ 2016-03-04 |  33 |   42 |        2
+ 2016-03-05 |  39 |   46 |        7
+ 2016-03-06 |  32 |   43 |        2
+(9 rows)
+
+newdb=# alter table temperatures alter column rainfall type numeric (6,3);
+ALTER TABLE
+newdb=# select * from temperatures
+;
+    date    | low | high | rainfall
+------------+-----+------+----------
+ 2016-03-07 |  29 |   32 |    0.000
+ 2016-03-08 |  23 |   31 |    0.000
+ 2016-03-09 |  17 |   28 |    0.000
+ 2016-03-01 |  34 |   43 |    3.000
+ 2016-03-02 |  32 |   44 |    3.000
+ 2016-03-03 |  31 |   47 |    4.000
+ 2016-03-04 |  33 |   42 |    2.000
+ 2016-03-05 |  39 |   46 |    7.000
+ 2016-03-06 |  32 |   43 |    2.000
+(9 rows)
+
+newdb=# update temperatures set rainfall = rainfall * 0.039;
+UPDATE 9
+newdb=# select * from temperatures
+;
+    date    | low | high | rainfall
+------------+-----+------+----------
+ 2016-03-07 |  29 |   32 |    0.000
+ 2016-03-08 |  23 |   31 |    0.000
+ 2016-03-09 |  17 |   28 |    0.000
+ 2016-03-01 |  34 |   43 |    0.117
+ 2016-03-02 |  32 |   44 |    0.117
+ 2016-03-03 |  31 |   47 |    0.156
+ 2016-03-04 |  33 |   42 |    0.078
+ 2016-03-05 |  39 |   46 |    0.273
+ 2016-03-06 |  32 |   43 |    0.078
+(9 rows)
+
+newdb=# alter table temperatures rename to weather;
+ALTER TABLE
+newdb=# \d
+          List of relations
+ Schema |   Name    | Type  |  Owner
+--------+-----------+-------+---------
+ public | employees | table | twill14
+ public | weather   | table | twill14
+(2 rows)
+
+newdb=# $ pg_dump -d newdb -t weather --inserts > dump.sql
+newdb-# ;
+ERROR:  syntax error at or near "$"
+LINE 1: $ pg_dump -d newdb -t weather
+        ^
+newdb=# \q
+Thomas-Williamss-MacBook-Pro% pg_dump -d newdb -t weather --inserts > dump.sql
+Thomas-Williamss-MacBook-Pro% psql newdb
+psql (9.6.1)
+Type "help" for help.
+
+newdb=# \d
+          List of relations
+ Schema |   Name    | Type  |  Owner
+--------+-----------+-------+---------
+ public | employees | table | twill14
+ public | weather   | table | twill14
+(2 rows)
+
+newdb=# \i ./documents/films2.sql
+psql:./documents/films2.sql:1: NOTICE:  table "films" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+newdb=# \d
+          List of relations
+ Schema |   Name    | Type  |  Owner
+--------+-----------+-------+---------
+ public | employees | table | twill14
+ public | films     | table | twill14
+ public | weather   | table | twill14
+(3 rows)
+
+newdb=# alter table films alter columns not null;
+ERROR:  syntax error at or near "not"
+LINE 1: alter table films alter columns not null;
+                                        ^
+newdb=# select * from films;;
+           title           | year |   genre   |       director       | duration
+---------------------------+------+-----------+----------------------+----------
+ Die Hard                  | 1988 | action    | John McTiernan       |      132
+ Casablanca                | 1942 | drama     | Michael Curtiz       |      102
+ The Conversation          | 1974 | thriller  | Francis Ford Coppola |      113
+ 1984                      | 1956 | scifi     | Michael Anderson     |       90
+ Tinker Tailor Soldier Spy | 2011 | espionage | Tomas Alfredson      |      127
+ The Birdcage              | 1996 | comedy    | Mike Nichols         |      118
+(6 rows)
+
+newdb=# alter table films alter column title set not null;
+ALTER TABLE
+newdb=# alter table films alter column year set not null;
+ALTER TABLE
+newdb=# alter table films alter column genre set not null;
+ALTER TABLE
+newdb=# alter table films alter column director set not null;
+ALTER TABLE
+newdb=# alter table films alter column duration set not null;
+ALTER TABLE
+newdb=# \d films
+             Table "public.films"
+  Column  |          Type          | Modifiers
+----------+------------------------+-----------
+ title    | character varying(255) | not null
+ year     | integer                | not null
+ genre    | character varying(100) | not null
+ director | character varying(255) | not null
+ duration | integer                | not null
+
+newdb=# alter table films add constraint title_unique unique (title);
+ALTER TABLE
+newdb=# \d films
+             Table "public.films"
+  Column  |          Type          | Modifiers
+----------+------------------------+-----------
+ title    | character varying(255) | not null
+ year     | integer                | not null
+ genre    | character varying(100) | not null
+ director | character varying(255) | not null
+ duration | integer                | not null
+Indexes:
+    "title_unique" UNIQUE CONSTRAINT, btree (title)
+
+newdb=# alter table films drop constraint title_unique;
+ALTER TABLE
+newdb=# alter table films add constraint title_length check (length(title) >=1);
+ALTER TABLE
+newdb=# insert into films (title) ;
+ERROR:  syntax error at or near ";"
+LINE 1: insert into films (title) ;
+                                  ^
+newdb=# insert into films (title) values () ;
+ERROR:  syntax error at or near ")"
+LINE 1: insert into films (title) values () ;
+                                          ^
+newdb=# insert into films (title) values ("") ;
+ERROR:  zero-length delimited identifier at or near """"
+LINE 1: insert into films (title) values ("") ;
+                                          ^
+newdb=# sql-course=# INSERT INTO films VALUES ('', 1901, 'action', 'JJ Abrams', 126);
+ERROR:  syntax error at or near "sql"
+LINE 1: sql-course=# INSERT INTO films VALUES ('', 1901, 'action', '...
+        ^
+newdb=# INSERT INTO films VALUES ('', 1901, 'action', 'JJ Abrams', 126);
+ERROR:  new row for relation "films" violates check constraint "title_length"
+DETAIL:  Failing row contains (, 1901, action, JJ Abrams, 126).
+newdb=# \d films
+             Table "public.films"
+  Column  |          Type          | Modifiers
+----------+------------------------+-----------
+ title    | character varying(255) | not null
+ year     | integer                | not null
+ genre    | character varying(100) | not null
+ director | character varying(255) | not null
+ duration | integer                | not null
+Check constraints:
+    "title_length" CHECK (length(title::text) >= 1)
+
+newdb=# alter table films drop constraint title_length;
+ALTER TABLE
+newdb=# alter table films add constraint film_year_range check year between 1900 and 2100;
+ERROR:  syntax error at or near "year"
+LINE 1: ... table films add constraint film_year_range check year betwe...
+                                                             ^
+newdb=# alter table films add constraint film_year_range check (year between 1900 and 210)0;
+ERROR:  syntax error at or near "0"
+LINE 1: ...nstraint film_year_range check (year between 1900 and 210)0;
+                                                                     ^
+newdb=# alter table films add constraint film_year_range check (year between 1900 and 2100);
+ALTER TABLE
+newdb=# \d films
+             Table "public.films"
+  Column  |          Type          | Modifiers
+----------+------------------------+-----------
+ title    | character varying(255) | not null
+ year     | integer                | not null
+ genre    | character varying(100) | not null
+ director | character varying(255) | not null
+ duration | integer                | not null
+Check constraints:
+    "film_year_range" CHECK (year >= 1900 AND year <= 2100)
+
+newdb=# alter table films add constraint director_value check (length(director) >= 3) and position(' ' in director) > 0);
+ERROR:  syntax error at or near "and"
+LINE 1: ...aint director_value check (length(director) >= 3) and positi...
+                                                             ^
+newdb=# alter table films add constraint director_value check (length(director) >= 3 and position(' ' in director) > 0);
+ALTER TABLE
+newdb=# \d films
+             Table "public.films"
+  Column  |          Type          | Modifiers
+----------+------------------------+-----------
+ title    | character varying(255) | not null
+ year     | integer                | not null
+ genre    | character varying(100) | not null
+ director | character varying(255) | not null
+ duration | integer                | not null
+Check constraints:
+    "director_value" CHECK (length(director::text) >= 3 AND "position"(director::text, ' '::text) > 0)
+    "film_year_range" CHECK (year >= 1900 AND year <= 2100)
+
+newdb=# update films set title = 'Johnny' where title = 'Die Hard';
+UPDATE 1
+newdb=# update films set title = 'Die Hard' where title = 'Johnny';
+UPDATE 1
+newdb=# update films set director = 'Johnny' where title = 'Die Hard';
+ERROR:  new row for relation "films" violates check constraint "director_value"
+DETAIL:  Failing row contains (Die Hard, 1988, action, Johnny, 132).
+newdb=# \i ./documents/films3.5.sql
+SET
+SET
+SET
+SET
+SET
+SET
+SET
+psql:./documents/films3.5.sql:14: ERROR:  constraint "title_unique" of relation "films" does not exist
+DROP TABLE
+DROP EXTENSION
+psql:./documents/films3.5.sql:17: ERROR:  cannot drop schema public because other objects depend on it
+DETAIL:  table employees depends on schema public
+table weather depends on schema public
+HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+psql:./documents/films3.5.sql:22: ERROR:  schema "public" already exists
+COMMENT
+CREATE EXTENSION
+COMMENT
+SET
+SET
+SET
+CREATE TABLE
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+newdb=#
+newdb=# \d
+          List of relations
+ Schema |   Name    | Type  |  Owner
+--------+-----------+-------+---------
+ public | employees | table | twill14
+ public | films     | table | twill14
+ public | weather   | table | twill14
+(3 rows)
+
+newdb=# \d films
+             Table "public.films"
+  Column  |          Type          | Modifiers
+----------+------------------------+-----------
+ title    | character varying(255) | not null
+ year     | integer                | not null
+ genre    | character varying(100) | not null
+ director | character varying(255) | not null
+ duration | integer                | not null
+Check constraints:
+    "director_name" CHECK (length(director::text) >= 1 AND "position"(director::text, ' '::text) > 0)
+    "title_length" CHECK (length(title::text) >= 1)
+    "year_range" CHECK (year >= 1900 AND year <= 2100)
+
+newdb=# select * from films;
+           title           | year |   genre   |       director       | duration
+---------------------------+------+-----------+----------------------+----------
+ Die Hard                  | 1988 | action    | John McTiernan       |      132
+ Casablanca                | 1942 | drama     | Michael Curtiz       |      102
+ The Conversation          | 1974 | thriller  | Francis Ford Coppola |      113
+ 1984                      | 1956 | scifi     | Michael Anderson     |       90
+ Tinker Tailor Soldier Spy | 2011 | espionage | Tomas Alfredson      |      127
+ The Birdcage              | 1996 | comedy    | Mike Nichols         |      118
+(6 rows)
+
+newdb=# INSERT INTO films(title, year, genre, director, duration) VALUES ('Godzilla', 1998, 'scifi', 'Roland Emmerich', 139);
+INSERT 0 1
+newdb=# INSERT INTO films(title, year, genre, director, duration) VALUES ('Godzilla', 2014, 'scifi', 'Gareth Edwards', 123);
+INSERT 0 1
+newdb=#
+newdb=# select * from films;
+           title           | year |   genre   |       director       | duration
+---------------------------+------+-----------+----------------------+----------
+ Die Hard                  | 1988 | action    | John McTiernan       |      132
+ Casablanca                | 1942 | drama     | Michael Curtiz       |      102
+ The Conversation          | 1974 | thriller  | Francis Ford Coppola |      113
+ 1984                      | 1956 | scifi     | Michael Anderson     |       90
+ Tinker Tailor Soldier Spy | 2011 | espionage | Tomas Alfredson      |      127
+ The Birdcage              | 1996 | comedy    | Mike Nichols         |      118
+ Godzilla                  | 1998 | scifi     | Roland Emmerich      |      139
+ Godzilla                  | 2014 | scifi     | Gareth Edwards       |      123
+(8 rows)
+
+newdb=# CREATE TABLE colors (id serial, name text);
+CREATE TABLE
+newdb=# INSERT INTO colors (name) VALUES ('red');
+INSERT 0 1
+newdb=# INSERT INTO colors (name) VALUES ('green');
+INSERT 0 1
+newdb=# INSERT INTO colors (name) VALUES ('blue');
+INSERT 0 1
+newdb=# select * from colors;
+ id | name
+----+-------
+  1 | red
+  2 | green
+  3 | blue
+(3 rows)
+
+newdb=#  ALTER TABLE colors ADD CONSTRAINT id_unique UNIQUE (id);
+ALTER TABLE
+newdb=# INSERT INTO colors (id, name) VALUES (3, 'orange');
+ERROR:  duplicate key value violates unique constraint "id_unique"
+DETAIL:  Key (id)=(3) already exists.
+newdb=# INSERT INTO colors (name) VALUES ('orange');
+INSERT 0 1
+newdb=# select * from colors;
+ id |  name
+----+--------
+  1 | red
+  2 | green
+  3 | blue
+  4 | orange
+(4 rows)
+
+newdb=# INSERT INTO colors (name) VALUES ('yellow');
+INSERT 0 1
+newdb=# select * from colors;
+ id |  name
+----+--------
+  1 | red
+  2 | green
+  3 | blue
+  4 | orange
+  5 | yellow
+(5 rows)
+
